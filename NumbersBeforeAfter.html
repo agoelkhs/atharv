@@ -1,0 +1,211 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+     <!--<link rel="stylesheet" href="./bootstrap.min.css">
+   
+        NOTES:
+            Audio files: https://pixabay.com/sound-effects/search/error/
+    -->
+    <style>
+        body {
+            background: 'rgba(200, 200, 200, 0.5)';
+        }
+        
+        .bgImage {
+            opacity: 0.6;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: -10;
+        }
+
+        .car {
+            width: 150px;
+            padding: 5px;
+        }
+
+        .cars {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 300px;
+        }
+
+        .reset {
+            display: inline;
+            width: 75px;
+            padding-left: 10px;
+            margin-bottom: 47px;
+        }
+
+        .score-board {
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+            border: solid blue;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 250px;
+        }
+
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        /* Create two equal columns that floats next to each other */
+        .column {
+            float: left;
+            width: 33.3%;
+        }
+        .number-row {
+            font-size: 38px;
+            color: #444;
+            border-bottom: solid 1px #ccc;
+            
+            text-align: center;
+        }
+       
+
+        .row-1 {
+            padding: 10%;
+        }
+
+        .lblNumber,
+        input {
+            width: 100px !important;
+            height: 100px;
+            font-size: 90px !important;
+            text-align: center;
+            color: blue !important;
+        }
+
+        .lblNumber {
+            color: red !important;
+        }
+
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+    <script>
+        function getRandomNumberInRange(min, max) {
+            return Math.floor(Math.random() * max) + min;
+        }
+
+        function onBodyLoad() {
+            init();
+        }
+
+        function init() {
+            document.body.style.backgroundColor = 'rgba(200, 200, 200, 0.5)'
+            document.getElementById('lblNumber').value = getRandomNumberInRange(1,9);
+            
+            document.getElementById('txtBefore').value = "";
+            document.getElementById('txtAfter').value = "";
+
+            document.getElementById('txtBefore').focus();
+        }
+
+        function enforceMinMaxBEFORE(el) {
+            const inputValue = parseInt(el.value);
+            if(!isNaN(inputValue)) {
+                const questionValue = parseInt(document.getElementById('lblNumber').value);
+                if (inputValue === (questionValue - 1)) {
+                    document.body.style.backgroundColor = 'rgba(0, 255, 0, 0.25)';
+                    document.getElementById("audioCorrect").play();
+                    
+                    document.getElementById("lblScore").innerHTML = parseInt(document.getElementById("lblScore").innerHTML) + 1;
+                    drawCars();
+                } else {
+                    document.body.style.backgroundColor = 'rgba(255, 0, 0, 0.5)';
+                    document.getElementById("audioError").play();
+                    const score = parseInt(document.getElementById("lblScore").innerHTML) - 1;
+                    document.getElementById("lblScore").innerHTML = Math.max(0, score);
+                    drawCars();
+                    setTimeout(function() {
+                        el.value = "";
+                    }, 800);
+                }
+            }
+        }
+
+        function enforceMinMaxAFTER(el) {
+            const inputValue = parseInt(el.value);
+            if(!isNaN(inputValue)) {
+                const questionValue = parseInt(document.getElementById('lblNumber').value);
+                document.body.style.backgroundColor = 'rgba(0, 255, 0, 0.25)';
+                if (inputValue === (questionValue + 1)) {
+                    document.getElementById("audioCorrect").play();
+                    document.getElementById("lblScore").innerHTML = parseInt(document.getElementById("lblScore").innerHTML) + 1;
+                    drawCars();
+                } else {
+                    document.body.style.backgroundColor = 'rgba(255, 0, 0, 0.5)';
+                    document.getElementById("audioError").play();
+                    const score = parseInt(document.getElementById("lblScore").innerHTML) - 1;
+                    document.getElementById("lblScore").innerHTML = Math.max(0, score);
+                    drawCars();
+                    setTimeout(function() {
+                        el.value = "";
+                    }, 800);
+                }
+            }
+        }
+
+        function focusElement(el) {
+            console.log('focus')
+            el.focus();
+        }
+
+        function drawCars() {
+            const score = parseInt(document.getElementById("lblScore").innerHTML);
+            let text = '';
+            for(var i = 0; i<score; i++) {
+                text += '<img class="car" src="./car-yellow.jpeg"></img>'
+            }
+            document.getElementById("cars").innerHTML = text;
+        }
+        
+    </script>
+</head>
+
+<body onload="onBodyLoad()">
+    <img class="bgImage" src="beach.jpg" />
+    <audio id="audioError" src="./error.mp3"></audio>
+    <audio id="audioCorrect" src="./car.mp3"></audio>
+
+    <div class="row row-1">
+        <div id="column-1" class="column">
+            <input id="txtBefore" type="text" onchange="enforceMinMaxBEFORE(this)" onclick="focusElement(this)" class="form-control">
+        </div>
+        <div id="column-2" class="column">
+            <input id="lblNumber" class="lblNumber" type="number" min="0" max="9"  disabled class="form-control">
+            <img class="reset" src="./reset.svg" onclick="init()" />
+        </div>
+        <div id="column-3" class="column">
+            <input id="txtAfter" type="text" onchange="enforceMinMaxAFTER(this)" class="form-control">
+        </div>
+        
+    </div>
+   
+    <div class="score-board">
+        Score4: <span id="lblScore">0</span>
+    </div>
+    <div id="cars"></div>
+</body>
+
+</html>
